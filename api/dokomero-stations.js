@@ -1,45 +1,109 @@
-const db = require("../config/database_promise");
+const db = require("../config/database");
 
 module.exports = {
-  station_all_data_get: async (req, res) => {
-    const error = (err) => {
-      console.error(err);
-      res.status(500).send("Error retrieving data from database");
-    };
+  station_all_data: (req, res) => {
+    let query;
+    query = `SELECT * FROM dokomero_stations`;
+    db.query(query, (err, result) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send("Error retrieving data from database");
+      } else {
+        res.json(result);
+      }
+    });
+  },
+  
+  station_add_data: (req, res) => {
+    let query;
+    const {
+      station_name,
+      company,
+      uuid,
+      message,
+      created_by_id,
+      updated_by_id,
+    } = req.body;
+    query = `INSERT INTO dokomero_stations (station_name, company, uuid, message, created_at, updated_at, created_by_id, updated_by_id) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 
-    try {
-      const [stations] = await db.query(`SELECT * FROM dokomero_stations`);
+    db.query(
+      query,
+      [
+        station_name,
+        company,
+        uuid,
+        message,
+        new Date(),
+        new Date(),
+        created_by_id,
+        updated_by_id,
+      ],
+      (err, result) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send("Error inserting data into database");
+        } else {
+          res.json(result);
+        }
+      }
+    );
+  },
 
-      const finishedResult = await Promise.all(
-        stations.map(async (station) => {
-          // Fetch platform data
-          const [platformDataS] = await db.query(
-            `SELECT * FROM dokomero_stations_platformdata WHERE connection_id = ?`,
-            [station.id]
-          );
+  station_search: (req, res) => {
+    const value = req.params.value;
+    const category = req.params.category;
+    let query;
+    query = `SELECT * FROM dokomero_stations WHERE ${category} = "${value}" `;
+    db.query(query, (err, result) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send("Error retrieving data from database");
+      } else {
+        res.json(result);
+      }
+    });
+  },
 
-          // Combine platform data with old melody data
-          const platformData = await Promise.all(
-            platformDataS.map(async (platformChild) => {
-              const [oldMelodyData] = await db.query(
-                `SELECT * FROM dokomero_stations_platformdata_oldmelody WHERE connection_id = ?`,
-                [platformChild.id]
-              );
+  station_platformdata_search: (req, res) => {
+    const id = req.params.id;
+    let query;
+    query = `SELECT * FROM dokomero_stations_platformdata WHERE connection_id = "${id}" `;
+    db.query(query, (err, result) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send("Error retrieving data from database");
+      } else {
+        res.json(result);
+      }
+    });
+  },
 
-              return { ...platformChild, old_melody: oldMelodyData };
-            })
-          );
+  station_platformdata_next_search: (req, res) => {
+    const id = req.params.id;
+    let query;
+    query = `SELECT * FROM dokomero_stations_platformdata_next WHERE connection_id = "${id}" `;
+    db.query(query, (err, result) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send("Error retrieving data from database");
+      } else {
+        res.json(result);
+      }
+    });
+  },
 
-          return {
-            ...station,
-            platformData,
-          };
-        })
-      );
-
-      res.status(200).json(finishedResult); // Send the final result as JSON
-    } catch (err) {
-      error(err); // Error handling if any query fails
-    }
+  station_platformdata_oldmelody_search: (req, res) => {
+    const id = req.params.id;
+    let query;
+    query = `SELECT * FROM dokomero_stations_platformdata_oldmelody WHERE connection_id = "${id}" `;
+    db.query(query, (err, result) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send("Error retrieving data from database");
+      } else {
+        res.json(result);
+      }
+    });
   },
 };
