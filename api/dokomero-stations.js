@@ -13,7 +13,7 @@ module.exports = {
       }
     });
   },
-  
+
   station_add_data: (req, res) => {
     let query;
     const {
@@ -77,6 +77,44 @@ module.exports = {
         res.json(result);
       }
     });
+  },
+
+  station_platformdata_add: (req, res) => {
+    let query;
+    const {
+      connection_id,
+      platform,
+      line_name,
+      melody_id,
+      close_id,
+      arrival_id,
+      direction,
+      switch_type,
+    } = req.body;
+    query = `INSERT INTO dokomero_stations_platformdata (connection_id, platform, line_name, melody_id,close_id,arrival_id,direction,switch_type) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+
+    db.query(
+      query,
+      [
+        connection_id,
+        platform,
+        line_name,
+        melody_id,
+        close_id,
+        arrival_id,
+        direction,
+        switch_type,
+      ],
+      (err, result) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send("Error inserting data into database");
+        } else {
+          res.json(result);
+        }
+      }
+    );
   },
 
   station_platformdata_next_search: (req, res) => {

@@ -7,6 +7,7 @@ const {
   station_platformdata_next_search,
   station_platformdata_oldmelody_search,
   station_add_data,
+  station_platformdata_add,
 } = require("./api/dokomero-stations");
 const {
   company_all_data,
@@ -19,15 +20,17 @@ require("dotenv").config();
 const app = express();
 const PORT = 5000;
 app.use(express.json());
-app.use(express.urlencoded({
-    extended: true
-}));
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
 app.get("/", (req, res) => {
   res.status(404).send("404 not found");
 });
 
 app.get("/test/body", (req, res) => {
-  res.status(200).json(req.body)
+  res.status(200).json(req.body);
 });
 
 app.get("/api/:collection_name", (req, res) => {
@@ -54,7 +57,7 @@ app.get("/api/dokomero/components/company/linedata/:id", (req, res) => {
   company_lineData_search(req, res);
 });
 
-app.get("/api/dokomero/station/all", (req, res) => {
+app.get("/api/dokomero/station", (req, res) => {
   station_all_data(req, res);
 });
 
@@ -68,6 +71,10 @@ app.get("/api/dokomero/station/:category/:value", (req, res) => {
 
 app.get("/api/dokomero/components/station/platformdata/:id", (req, res) => {
   station_platformdata_search(req, res);
+});
+
+app.post("/api/dokomero/components/station/platformdata/", (req, res) => {
+  station_platformdata_add(req, res);
 });
 
 app.get(
