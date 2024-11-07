@@ -131,6 +131,25 @@ module.exports = {
     });
   },
 
+  station_platformdata_next_add: (req, res) => {
+    let query;
+    const { connection_id, description, platform, station_id } = req.body;
+    query = `INSERT INTO dokomero_stations_platformdata_next (connection_id,description,platform,station_id) 
+             VALUES (?, ?, ?, ?)`;
+    db.query(
+      query,
+      [connection_id, description, platform, station_id],
+      (err, result) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send("Error inserting data into database");
+        } else {
+          res.json(result);
+        }
+      }
+    );
+  },
+
   station_platformdata_oldmelody_search: (req, res) => {
     const id = req.params.id;
     let query;
@@ -139,6 +158,22 @@ module.exports = {
       if (err) {
         console.error(err);
         res.status(500).send("Error retrieving data from database");
+      } else {
+        res.json(result);
+      }
+    });
+  },
+
+  station_platformdata_oldmelody_add: (req, res) => {
+    let query;
+    const { connection_id, melody_id } = req.body;
+    query = `INSERT INTO dokomero_stations_platformdata_oldmelody (connection_id,melody_id) 
+             VALUES (?, ?)`;
+
+    db.query(query, [connection_id, melody_id], (err, result) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send("Error inserting data into database");
       } else {
         res.json(result);
       }

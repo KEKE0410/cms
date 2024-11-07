@@ -8,6 +8,8 @@ const {
   station_platformdata_oldmelody_search,
   station_add_data,
   station_platformdata_add,
+  station_platformdata_next_add,
+  station_platformdata_oldmelody_add,
 } = require("./api/dokomero-stations");
 const {
   company_all_data,
@@ -18,7 +20,7 @@ const { sound_id_search } = require("./api/dokomero-melody");
 require("dotenv").config();
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.API_PORT;
 app.use(express.json());
 app.use(
   express.urlencoded({
@@ -41,11 +43,7 @@ app.get("/api/:collection_name/:id", (req, res) => {
   db_id_get(req, res);
 });
 
-app.get("/api/dokomero/company/all", (req, res) => {
-  company_all_data(req, res);
-});
-
-app.post("/api/dokomero/company/", (req, res) => {
+app.get("/api/dokomero/company", (req, res) => {
   company_all_data(req, res);
 });
 
@@ -84,10 +82,21 @@ app.get(
   }
 );
 
+app.post("/api/dokomero/components/station/platformdata-next/", (req, res) => {
+  station_platformdata_next_add(req, res);
+});
+
 app.get(
   "/api/dokomero/components/station/platformdata-oldmelody/:id",
   (req, res) => {
     station_platformdata_oldmelody_search(req, res);
+  }
+);
+
+app.post(
+  "/api/dokomero/components/station/platformdata-oldmelody",
+  (req, res) => {
+    station_platformdata_oldmelody_add(req, res);
   }
 );
 
